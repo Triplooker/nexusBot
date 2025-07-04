@@ -1,40 +1,53 @@
 #!/bin/bash
 
-# File: nexus.sh
-# Purpose: Run all Nexus nodes listed in node.txt in separate screen sessions
+# === nexus.sh ===
+# Starts multiple Nexus nodes in separate screen sessions
 
-# Load environment variables
-source ~/.bashrc
-source $HOME/.cargo/env
+BASHRC="$HOME/.bashrc"
+CARGO_ENV="$HOME/.cargo/env"
 
-# Check if Nexus CLI is installed
-if ! command -v nexus-network &> /dev/null; then
-  echo "🛠️ Installing Nexus CLI..."
-  curl https://cli.nexus.xyz/ | sh
-  source ~/.bashrc
+# Load environment safely
+if [[ -f "$BASHRC" ]]; then
+  source "$BASHRC"
 fi
 
-# Check node.txt exists
+if [[ -f "$CARGO_ENV" ]]; then
+  source "$CARGO_ENV"
+fi
+
+# Install Nexus CLI if missing
+if ! command -v nexus-network &> /dev/null; then
+  echo "🛠️ Installing Nexus CLI..."
+  curl -s https://cli.nexus.xyz/ | sh
+  source "$BASHRC"
+fi
+
+# Check node.txt file
 if [[ ! -f "node.txt" ]]; then
-  echo "❌ node.txt not found! Please create it with one NODE_ID per line."
+  echo "❌ node.txt not found! Add one NODE_ID per line."
   exit 1
 fi
 
-# Launch each node in a separate screen session
+# Read and launch nodes
 index=1
 while IFS= read -r NODE_ID || [[ -n "$NODE_ID" ]]; do
-  if [[ -n "$NODE_ID" ]]; then
+  if [[ ! -z "$NODE_ID" ]]; then
     SCREEN_NAME="nexus_$index"
-    echo "🚀 Launching Node ID $NODE_ID in screen session: $SCREEN_NAME"
+    LOG_FILE="node_${index}_log.txt"
+
+    echo "🚀 Launching Node ID $NODE_ID in screen [$SCREEN_NAME] — Logging to $LOG_FILE"
 
     screen -dmS "$SCREEN_NAME" bash -c "
-      source ~/.bashrc
-      source $HOME/.cargo/env
-      nexus-network start --node-id $NODE_ID
+      echo '▶️ Node $NODE_ID started at \$(date)' | tee $LOG_FILE
+      source $BASHRC
+      if [[ -f \"$CARGO_ENV\" ]]; then
+        source \"$CARGO_ENV\"
+      fi
+      nexus-network start --node-id $NODE_ID 2>&1 | tee -a $LOG_FILE
     "
 
     ((index++))
   fi
 done < node.txt
 
-echo "✅ All nodes are now running in background screen sessions."
+echo "✅ All node sessions launched. Use 'screen -ls' to list them."
