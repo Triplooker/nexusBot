@@ -39,7 +39,7 @@ Put each Node ID (from Nexus Dashboard) in a new line like:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/itsmesatyavir/nexusBot.git
+   git clone https://github.com/Triplooker/nexusBot.git
    cd nexusBot
    ```
 
