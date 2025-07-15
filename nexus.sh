@@ -15,11 +15,14 @@ if [[ -f "$CARGO_ENV" ]]; then
   source "$CARGO_ENV"
 fi
 
-# Install Nexus CLI if missing
-if ! command -v nexus-network &> /dev/null; then
-  echo "🛠️ Installing Nexus CLI..."
-  curl -s https://cli.nexus.xyz/ | sh
-  source "$BASHRC"
+# Install specific version of Nexus CLI if missing
+if [[ ! -f "./nexus" ]] || [[ ! -x "./nexus" ]]; then
+  echo "🛠️ Installing Nexus CLI v0.9.7..."
+  wget -O nexus https://github.com/nexus-xyz/nexus-cli/releases/download/v0.9.7/nexus-network-linux-x86_64 && chmod +x nexus
+  if [[ $? -ne 0 ]]; then
+    echo "❌ Failed to download Nexus CLI"
+    exit 1
+  fi
 fi
 
 # Check node.txt file
@@ -43,7 +46,7 @@ while IFS= read -r NODE_ID || [[ -n "$NODE_ID" ]]; do
       if [[ -f \"$CARGO_ENV\" ]]; then
         source \"$CARGO_ENV\"
       fi
-      nexus-network start --node-id $NODE_ID 2>&1 | tee -a $LOG_FILE
+      ./nexus start --node-id $NODE_ID 2>&1 | tee -a $LOG_FILE
     "
 
     ((index++))
