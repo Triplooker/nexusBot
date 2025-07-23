@@ -17,11 +17,11 @@ fi
 
 # Install specific version of Nexus CLI if missing
 if [[ ! -f "./nexus" ]] || [[ ! -x "./nexus" ]]; then
-  echo "🛠️ Installing Nexus CLI v0.10.0..."
+  echo "🛠️ Installing Nexus CLI v0.10.1..."
   if command -v curl &> /dev/null; then
-    curl -L -o nexus https://github.com/nexus-xyz/nexus-cli/releases/download/v0.10.0/nexus-network-linux-x86_64 && chmod +x nexus
+    curl -L -o nexus https://github.com/nexus-xyz/nexus-cli/releases/download/v0.10.1/nexus-network-linux-x86_64 && chmod +x nexus
   elif command -v wget &> /dev/null; then
-    wget -O nexus https://github.com/nexus-xyz/nexus-cli/releases/download/v0.10.0/nexus-network-linux-x86_64 && chmod +x nexus
+    wget -O nexus https://github.com/nexus-xyz/nexus-cli/releases/download/v0.10.1/nexus-network-linux-x86_64 && chmod +x nexus
   else
     echo "❌ Neither curl nor wget found. Please install one of them."
     exit 1
